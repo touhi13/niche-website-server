@@ -18,7 +18,10 @@ app.use(express.json());
 
 console.log(process.env.DB_PASS)
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7xnb9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7xnb9.mongodb.net/myFirstDatabase`;
+
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 async function verifyToken(req, res, next) {
     if (req.headers?.authorization?.startsWith('Bearer ')) {
@@ -37,6 +40,10 @@ async function verifyToken(req, res, next) {
 }
 
 async function run() {
+    await client.connect();
+    const database = client.db('paprii');
+    // const appointmentsCollection = database.collection('appointments');
+    const usersCollection = database.collection('users');
     try {
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
